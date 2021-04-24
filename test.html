@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.0/echarts.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.0.11/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <button @click="change">change layout.height</button>
+
+      <echart-box
+        :layout="layout"
+        style="width: 500px; height: 300px"
+      ></echart-box>
+    </div>
+    <script>
+      var app = Vue.createApp({
+        data() {
+          return {
+            layout: {
+              height: 300,
+              width: 300,
+            },
+            show: false,
+            grid: null,
+          };
+        },
+        methods: {
+          change() {
+            this.layout.height = 500;
+          },
+        },
+      });
+      app.component("echart-box", {
+        template: `<div ref="chart"></div>`,
+        props: {
+          layout: Object,
+        },
+        data() {
+          return {
+            watchFunc: true,
+            chart: null,
+          };
+        },
+        mounted() {
+          this.render();
+          this.$watch(
+            () => this.$props.layout.height,
+            () => {
+              this.chart.resize();
+            }
+          );
+        },
+        methods: {
+          render() {
+            if (!this.chart) {
+              this.chart = echarts.init(this.$refs.chart);
+            }
+            this.chart.setOption({
+              legend: {
+                data: ["产值", "成本"],
+              },
+              xAxis: [
+                {
+                  data: [2019, 2020, 2021],
+                  type: "category",
+                  axisTick: {
+                    alignWithLabel: true,
+                  },
+                },
+              ],
+              yAxis: [
+                {
+                  type: "value",
+                },
+              ],
+              series: [
+                {
+                  type: "bar",
+                  name: "产值",
+                  color: "#4992ff",
+                  data: [275, 257, 362],
+                },
+                {
+                  type: "bar",
+                  name: "成本",
+                  color: "#7cffb2",
+                  data: [136, 125, 138],
+                },
+              ],
+            });
+          },
+        },
+      });
+
+      app.mount("#app");
+    </script>
+  </body>
+</html>
